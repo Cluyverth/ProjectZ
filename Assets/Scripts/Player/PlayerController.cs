@@ -10,9 +10,10 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
 
     private bool jump = false;
+    private int addJumps;
     private float directionMoveInput;
 
-    [Header("Player Movement")]
+    [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 5;
     [SerializeField] private float jumpForce = 7;
     [SerializeField] private LayerMask layerGround;
@@ -28,18 +29,30 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         directionMoveInput = Input.GetAxis("Horizontal");
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("Jump")) && isGrounded()) { jump = true; }
+        if (isGrounded()) 
+        {
+            addJumps = 1;
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("Jump")) { jump = true; }
+        }
+        else
+        {
+            if ((Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("Jump")) && addJumps > 0) 
+            { 
+                jump = true;
+                addJumps--;
+            }
+        }
     }
 
     private void FixedUpdate()
     {
-        MovePlayer();
-        if (jump) { JumpPlayer(); }
+        Move();
+        if (jump) { Jump(); }
     }
 
-    private void MovePlayer() { rb.velocity = new Vector2(directionMoveInput * moveSpeed, rb.velocity.y); }
+    private void Move() { rb.velocity = new Vector2(directionMoveInput * moveSpeed, rb.velocity.y); }
 
-    private void JumpPlayer() 
+    private void Jump() 
     { 
         rb.velocity = Vector2.up * jumpForce; 
         jump = false;
