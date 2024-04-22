@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     private Rigidbody2D rb;
+    private BoxCollider2D boxCollider;
+    private Animator animator;
 
     [Header("Player Movement")]
     [SerializeField] private float moveSpeed = 5;
@@ -16,17 +18,19 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        boxCollider = GetComponent<BoxCollider2D>();
     }
 
     // Update is called once per frame
     void Update()
-    {  
-
+    {
+        MovePlayer();
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded()) { JumpPlayer(); }
     }
 
     private void FixedUpdate()
     {
-        MovePlayer();
+
     }
 
     private void MovePlayer()
@@ -35,6 +39,15 @@ public class PlayerController : MonoBehaviour
 
         rb.velocity = new Vector2(direction * moveSpeed, rb.velocity.y);
 
+    }
+
+    private void JumpPlayer() { rb.velocity = Vector2.up * jumpForce; }
+
+    private bool isGrounded()
+    {
+        RaycastHit2D ground = Physics2D.BoxCast(boxCollider.bounds.center, boxCollider.bounds.size, 0, Vector2.down, 0.1f, layerGround);
+
+        return ground.collider != null;
     }
 
 }
